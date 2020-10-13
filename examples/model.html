@@ -1,0 +1,57 @@
+<!--
+ * @Author: luzhijing
+ * @Date: 2020-10-13 18:01:33
+ * @LastEditors: luzhijing
+ * @LastEditTime: 2020-10-13 19:40:03
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="./js/three.js"></script>
+    <script src="./js/loaders/OBJLoader.js"></script>
+  </head>
+  <body></body>
+</html>
+<script>
+  var mesh = null,
+    scene = null,
+    camera = null,
+    renderer = null,
+    id=null;
+  var loader = new THREE.OBJLoader();
+  window.onload = function(){
+
+    init();
+  }
+  function init() {
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    scene = new THREE.Scene();
+    camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+    camera.position.set(15, 25, 25);
+    camera.lookAt(new THREE.Vector3(-10, 2, 0));
+    scene.add(camera);
+    loader.load("./assets/yuebing/file.obj", function (obj) {
+      console.log(obj);
+      mesh = obj;
+      scene.add(obj);
+    });
+    var light = new THREE.DirectionalLight(0xffffff);
+    light.position.set(20, 10, 5);
+    scene.add(light);
+    id = setInterval(draw, 20);
+  }
+  function draw() {
+    renderer.render(scene, camera);
+
+    mesh.rotation.y += 0.01;
+    if (mesh.rotation.y > Math.PI * 2) {
+      mesh.rotation.y -= Math.PI * 2;
+    }
+  }
+</script>

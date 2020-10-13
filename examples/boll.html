@@ -1,0 +1,131 @@
+<!--
+ * @Author: luzhijing
+ * @Date: 2020-10-13 15:40:01
+ * @LastEditors: luzhijing
+ * @LastEditTime: 2020-10-13 17:57:58
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        position: relative;
+      }
+    </style>
+  </head>
+  <body>
+    <button onclick="drop()">dorp</button>
+  </body>
+</html>
+<script src="./js/three.js"></script>
+<script src="./js/libs/stats.min.js"></script>
+<script>
+  const requestAnimationFrame =
+    window.requestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.msRequestAnimationFrame;
+  window.requestAnimationFrame = requestAnimationFrame;
+
+  let scene = null,
+    camera = null,
+    renderer = null,
+    id = null,
+    stat = null;
+  let ballMesh = null,
+    ballRadius = 0.5,
+    v = 0,
+    a = -0.01,
+    isMoving = false,
+    maxHeight = 5;
+
+  init();
+  function init() {
+    //fps监听器
+    stat = new Stats();
+    stat.domElement.style.position = "absolute";
+    stat.domElement.style.right = "0px";
+    stat.domElement.style.top = "0px";
+    stat.domElement.style.width = "80px";
+    document.body.appendChild(stat.domElement);
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(600, 500);
+    document.body.appendChild(renderer.domElement);
+
+    scene = new THREE.Scene();
+    var color = new THREE.Color("#fff");
+    scene.background = color;
+    camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+    camera.position.set(5, 10, 20);
+    // camera.lookAt(5,10,20)
+    camera.lookAt(new THREE.Vector3(0, 3, 0));
+    scene.add(camera);
+    ballMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(ballRadius),
+      new THREE.MeshLambertMaterial({
+        color: 0xffff00,
+      })
+    );
+    ballMesh.position.y = ballRadius;
+    scene.add(ballMesh);
+
+    const texture = THREE.ImageUtils.loadTexture(
+      "./img/chess.png",
+      {},
+      function () {
+        renderer.render(scene, camera);
+      }
+    );
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(4, 4);
+
+    const plane = new THREE.Mesh(
+      new THREE.PlaneGeometry(5, 5),
+      new THREE.MeshLambertMaterial({ map: texture })
+    );
+    plane.rotation.x = -Math.PI / 2;
+    scene.add(plane);
+    var light = new THREE.DirectionalLight(0xffffff);
+    light.position.set(10, 10, 15);
+    scene.add(light);
+    var axisHelper = new THREE.AxisHelper(1);
+    scene.add(axisHelper);
+    // renderer.render(scene,camera)
+    id = requestAnimationFrame(draw);
+  }
+
+  function draw() {
+    stat.begin();
+    if (isMoving) {
+      ballMesh.position.y += v;
+      v += a;
+      if (ballMesh.position.y <= ballRadius) {
+        // hit plane
+        v = -v * 0.9;
+      }
+      if (Math.abs(v) < 0.001) {
+        // stop moving
+        isMoving = false;
+        ballMesh.position.y = ballRadius;
+      }
+    }
+    renderer.render(scene, camera);
+    id = requestAnimationFrame(draw);
+    stat.end();
+  }
+  function stop() {
+    if (id !== null) {
+      cancelAnimationFrame(id);
+      id = null;
+    }
+  }
+  function drop() {
+    isMoving = true;
+    ballMesh.position.y = maxHeight;
+    v = 0;
+  }
+</script>

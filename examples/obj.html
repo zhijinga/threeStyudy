@@ -27,11 +27,11 @@
       var scene, camera, renderer, container;
       var light, controls, group, stats;
       init();
-      const geometry = new THREE.BoxGeometry(); //创建一个几何 BoxGeometry 立方体对象
+      const geometry = new THREE.BoxGeometry(1,1,1,2,2,2); //创建一个几何 BoxGeometry 立方体对象
       const material = new THREE.MeshBasicMaterial({ color: "#fff" }); //创建材质
 
       const cube = new THREE.Mesh(geometry, material); //网格
-      cube.position.set(0,0,5)
+      cube.position.set(0, 0, 2)
       scene.add(cube);
       animate();
       function init() {
@@ -56,7 +56,7 @@
           1,
           50
         );
-        camera.position.set(50, 0, 0); //设置相机位置
+        camera.position.set(0, 0, 10); //设置相机位置
 
         // 设置鼠标操作（控制器）
         controls = new THREE.OrbitControls(
@@ -97,6 +97,7 @@
 
       function animate() {
         requestAnimationFrame(animate);
+        // controls.update()
         renderer.render(scene, camera);
       }
     </script>
